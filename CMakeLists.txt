@@ -3,8 +3,10 @@ project(norm)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(norm
+add_executable(Term2Classes
         complex.cpp
         complex.h
         main.cpp
+        ArithmVectorN.cpp
+        ArithmVectorN.h
 )
