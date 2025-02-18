@@ -23,6 +23,11 @@ ArithmVectorN::ArithmVectorN(const ArithmVectorN &anotherVector) {
     }
 }
 
+ArithmVectorN::~ArithmVectorN() {
+    delete[] coordinates;
+}
+
+
 const double *ArithmVectorN::getCoordinates() const {
     return coordinates;
 }
@@ -143,6 +148,15 @@ double ArithmVectorN::operator[](const int index) const {
     throw std::out_of_range("Index out of range");
 }
 
+double &ArithmVectorN::operator[](int index) {
+    if (index >= 0 && index < N) {
+        return coordinates[index];
+    } else {
+        throw std::out_of_range("Index out of range");
+    }
+}
+
+
 std::ostream& operator<< (std::ostream& out, const ArithmVectorN& vec) {
     out << "(";
     for (int i = 0; i < ArithmVectorN::N; ++i) {
@@ -153,4 +167,11 @@ std::ostream& operator<< (std::ostream& out, const ArithmVectorN& vec) {
     }
     out << ")";
     return out;
+}
+
+std::istream& operator>> (std::istream& in, ArithmVectorN& vec) {
+    for (size_t i = 0; i < ArithmVectorN::N; i++) {
+        in >> vec.coordinates[i];
+    }
+    return in;
 }

@@ -18,6 +18,7 @@ public:
     ArithmVectorN();
     explicit ArithmVectorN(const double initCoordinates[N]);
     ArithmVectorN(const ArithmVectorN &anotherVector);
+    ~ArithmVectorN();
 
     const double *getCoordinates() const;
     void setCoordinates(const double coordinates[N]);
@@ -42,9 +43,10 @@ public:
 
     ArithmVectorN& operator=(const ArithmVectorN& anotherVector);
     double operator[] (int index) const;
+    double& operator[] (int index);
 
     friend std::ostream& operator<< (std::ostream& out, const ArithmVectorN& vec);
-    friend std::istream& operator>> (std::istream& in, const ArithmVectorN& vec);
+    friend std::istream& operator>> (std::istream& in, ArithmVectorN& vec);
 };
 
 
