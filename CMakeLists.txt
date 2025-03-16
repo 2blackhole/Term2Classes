@@ -10,8 +10,8 @@ add_executable(Term2Classes
         ArithmVectorN.h
         VeryUsefulAllocator.cpp
         VeryUsefulAllocator.h
-        VeryUsefulIterator.cpp
-        VeryUsefulIterator.h
         MyString.h
         MyString.cpp
+        MyStringIterator.cpp
+        MyStringIterator.h
 )

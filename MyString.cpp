@@ -11,7 +11,7 @@ void MyString::Realloc(const size_t capacity) {
     if (capacity == m_capacity) return;
 
     if (capacity < m_size) {
-        ::operator delete[](m_data + capacity, m_data + m_size);
+        ::operator delete[](m_data + m_size, m_data + m_capacity);
         m_size = capacity - 1;
         m_capacity = capacity;
         return;
@@ -46,9 +46,44 @@ void MyString::pop_back() {
     m_data[m_size] = '\0';
 }
 
-// size_t MyString::find(const MyString &substr, size_t pos) {
-//
-// }
+std::vector<int> prefix_function(const MyString& s) {
+    std::vector<int> pi(s.size(), 0);
+
+    for (int i = 1; i < s.size(); i++) {
+        int j = pi[i - 1];
+
+        while (j > 0 && s[i] != s[j]) {
+            j = pi[j - 1];
+        }
+
+        if (s[i] == s[j]) {
+            pi[i] = j + 1;
+        } else {
+            pi[i] = j;
+        }
+    }
+
+    return pi;
+}
+
+//if no mathes return MyString::npos, which is the biggest size_t value
+size_t MyString::find(const MyString &substr, size_t pos) const {
+    std::vector<int> prefix = prefix_function(substr);
+    int q = 0;
+
+    for (size_t i = pos; i < m_size; ++i) {
+        while (q > 0 && m_data[i] != substr.m_data[q]) {
+            q = prefix[q - 1];
+        }
+        if (m_data[i] == substr.m_data[q]) {
+            q++;
+        }
+        if (q == substr.m_size) {
+            return i - substr.m_size + 1;
+        }
+    }
+    return MyString::npos;
+}
 
 
 MyString& MyString::operator=(const MyString& str) {
@@ -76,7 +111,6 @@ MyString &MyString::operator=(MyString &&str)  noexcept {
 
 size_t MyString::insert(size_t pos, char ch) {
     if (ch == '\0') ch = ' ';
-    if (m_size == 0) return pos;
     if (pos > m_size) {
         throw std::out_of_range("Index out of range");
     }
@@ -93,28 +127,32 @@ size_t MyString::insert(size_t pos, char ch) {
 }
 
 size_t MyString::insert(size_t pos, const MyString &substr) {
-    if (m_size == 0) return pos;
-    if (pos > this->m_size) {
+    if (pos > m_size) {
         throw std::out_of_range("Index out of range");
     }
-    if ((this->m_size + substr.m_size) >= this->m_capacity) {
-        Realloc(this->m_size + substr.m_size * 2);
+
+    const size_t required_size = m_size + substr.m_size;
+
+    if (required_size >= m_capacity) {
+        Realloc(required_size * 2 + 1);
     }
 
-    for(size_t i = pos; i < this->m_size; i++) {
-        this->m_data[this->m_size + i + 1] = this->m_data[i];
+    for (size_t i = m_size; i > pos; --i) {
+        m_data[i + substr.m_size - 1] = m_data[i - 1];
     }
 
-    for (size_t i = 0; i < substr.m_size; i++) {
-        this->m_data[i + pos] = substr.m_data[i];
+    for (size_t i = 0; i < substr.m_size; ++i) {
+        m_data[pos + i] = substr.m_data[i];
     }
-    this->m_size += substr.m_size;
-    this->m_data[this->m_size] = '\0';
+
+    m_size += substr.m_size;
+    m_data[m_size] = '\0';
+
     return pos;
 }
 
 size_t MyString::erase(size_t pos) {
-    if (m_size == 0) return pos;
+    if (m_size == 0) throw std::invalid_argument("String must not be null");
     if (pos > m_size - 1)
         throw std::out_of_range("Pos out of range");
     size_t it = m_size - 1;
@@ -129,20 +167,22 @@ size_t MyString::erase(size_t pos) {
     return pos;
 }
 
-size_t MyString::erase(const size_t pos, size_t count) {
-    if ((pos + count) > m_size - 1)
-        count = m_size - pos;
-    size_t it = 0;
-    while (m_data[pos + count + it] != '\0') {
-        m_data[pos + it] = m_data[pos + count + it];
-        it++;
+size_t MyString::erase(size_t pos, size_t count) {
+    if (m_size == 0) {
+        throw std::invalid_argument("String is empty");
     }
-    while (m_data[pos + it] != '\0') {
-        m_data[pos + it] = '\0';
-        it++;
+    if (pos >= m_size) {
+        throw std::out_of_range("Position out of range");
+    }
+    if (count == 0 || pos + count > m_size) {
+        count = m_size - pos;
+    }
+    for (size_t i = pos; i < m_size - count; ++i) {
+        m_data[i] = m_data[i + count];
     }
     m_size -= count;
     m_data[m_size] = '\0';
+
     return pos;
 }
 
@@ -176,6 +216,7 @@ int stoi_(const MyString &str, int base = 10) {
     }
     int sign = 1, n = 0;
     char* ptr = str.m_data;
+    while (*ptr == ' ') {*ptr++;}
 
     if (*ptr == '-') {sign = -1; ptr++;}
     int d_ascii_ = base - 10;
@@ -193,7 +234,7 @@ int stoi_(const MyString &str, int base = 10) {
     return n * sign;
 }
 
-int stoll_(const MyString &str, int base = 10) {
+long long stoll_(const MyString &str, int base = 10) {
     if (base > 36 || base < 2) throw std::invalid_argument("Invalid base param");
     if (str.empty()) {
         throw std::invalid_argument("String must not be null");
@@ -201,11 +242,17 @@ int stoll_(const MyString &str, int base = 10) {
     int sign = 1;
     long long n = 0;
     char* ptr = str.m_data;
+    while (*ptr == ' ') {*ptr++;}
 
-    if (*ptr == '-') {sign = -1; ptr++;}
+    if (*ptr == '-') {
+        sign = -1;
+        ptr++;
+    }
     int d_ascii_ = base - 10;
     while (*ptr != '\0') {
-        if (*ptr == '.') return n * sign;
+        if (*ptr == '.')
+            return n * sign;
+        if (*ptr == ' ') {*ptr++; continue;}
         int ascii_ = *ptr - '0';
         if (ascii_ > 16) ascii_ -= 7;
         if (!((ascii_ > -1 && ascii_ < 10 + d_ascii_) || (ascii_ > 16 && ascii_ < (17 + d_ascii_)))) {
@@ -229,14 +276,19 @@ double stod_(const MyString &str, int base = 10) {
 
     char* ptr = str.m_data;
 
-    if (*ptr == '-') {sign = -1; ptr++;}
+    while (*ptr == ' ') {*ptr++; p_index++;}
+    if (*ptr == '-') {sign = -1; ptr++; p_index++;}
     int d_ascii_ = base - 10;
     while (*ptr != '\0') {
-        if (*ptr != '.') p_index++;
-        if (*ptr == '.') break;
+        if (*ptr == ' ') {*ptr++; continue;}
+        if (*ptr != '.')
+            p_index++;
+        if (*ptr == '.')
+            break;
         int ascii_ = *ptr - '0';
         if (ascii_ > 16) ascii_ -= 7;
-        if (!((ascii_ > -1 && ascii_ < 10 + d_ascii_) || (ascii_ > 16 && ascii_ < (17 + d_ascii_)))) {
+        if (!((ascii_ > -1 && ascii_ < 10 + d_ascii_) ||
+            (ascii_ > 16 && ascii_ < (17 + d_ascii_)))) {
             throw std::invalid_argument("Invalid literal for that base");
         }
         if (DBL_MAX / base < n) throw std::out_of_range("Number is too big for double");
@@ -245,11 +297,17 @@ double stod_(const MyString &str, int base = 10) {
     }
 
     for (size_t i = str.m_size - 1; i + 1> p_index; i--) {
-        if (str.m_data[i] == '.' && i == p_index)  {break;}
-        if (str.m_data[i] == '.' && i != p_index) {continue;}
+        if (str.m_data[i] == '.' && i == p_index) {
+            break;
+        }
+        if (str.m_data[i] == '.' && i != p_index) {
+            d_n = 0;
+            continue;
+        }
         int ascii_ = str.m_data[i] - '0';
         if (ascii_ > 16) ascii_ -= 7;
-        if (!((ascii_ > -1 && ascii_ < 10 + d_ascii_) || (ascii_ > 16 && ascii_ < (17 + d_ascii_)))) {
+        if (!((ascii_ > -1 && ascii_ < 10 + d_ascii_) ||
+            (ascii_ > 16 && ascii_ < (17 + d_ascii_)))) {
             throw std::invalid_argument("Invalid literal for that base");
         }
         d_n = d_n / base + ascii_;
@@ -257,5 +315,11 @@ double stod_(const MyString &str, int base = 10) {
 
     d_n /= base;
     double res = sign * (n + d_n);
+    return res;
+}
+
+MyString operator+(const MyString &str1, const MyString &str2) {
+    MyString res(str1);
+    res += str2;
     return res;
 }
