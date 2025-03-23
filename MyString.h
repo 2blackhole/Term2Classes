@@ -8,7 +8,6 @@ class MyString {
     size_t m_size = 0;
     size_t m_capacity = 0;
 
-
     void Realloc(size_t capacity);
 
 public:
@@ -112,6 +111,12 @@ public:
         return m_capacity;
     }
 
+    void swap(MyString& other) {
+        std::swap(m_size, other.m_size);
+        std::swap(m_data, other.m_data);
+        std::swap(m_capacity, other.m_capacity);
+    }
+
     void print() const {
         for (size_t i = 0; i < m_size; i++) {
             std::cout << m_data[i];
@@ -130,6 +135,12 @@ public:
         Realloc(count + 1);
         m_data[m_size] = '\0';
     };
+
+    void reverse() {
+        for (size_t i = 0; i < m_size / 2; i++) {
+            std::swap(m_data[m_size - i - 1], m_data[i]);
+        }
+    }
     size_t insert(size_t pos, char ch);  // aaa, insert(2, 'b') => aaba, return pos
     size_t insert(size_t pos, const MyString& substr); // aaa, insert(2, "bc") => aabca
     size_t erase(size_t pos);  // aaba, erase(2) => aaa
@@ -184,16 +195,17 @@ public:
     friend int stoi_(const MyString& str, int base);
     friend long long stoll_(const MyString& str, int base);
     friend double stod_(const MyString& str, int base);
+    // friend MyString to_string_(int n);
+    // friend MyString to_string_(long long n);
 
-    template <typename T>
-    friend MyString to_string(T n);
 };
 
 
 MyString operator+(const MyString &str1, const MyString &str2);
-
-
-
 std::vector<int> prefix_function(const MyString& str);
-
-
+//
+// int stoi_(const MyString& str, int base);
+// long long stoll_(const MyString& str, int base);
+// double stod_(const MyString& str, int base);
+MyString to_string_(int n);
+MyString to_string_(long long n);

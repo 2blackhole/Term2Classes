@@ -1,8 +1,10 @@
 #include <iomanip>
 #include <iostream>
-#include "MyString.h"
 #include <string>
 #include <cmath>
+#include "MyString.h"
+#include "VectorBananov.h"
+
 std::string formatResult(size_t result, size_t expected) {
     if (result == MyString::npos && expected == MyString::npos) return "npos";
     if (result == MyString::npos) return "npos (expected: " + std::to_string(expected) + ")";
@@ -149,6 +151,7 @@ void testConversions() {
 
     MyString strDouble3("1010.11");
     double resDouble3 = stod_(strDouble3, 2);
+
     std::cout << "[Test 9] stod_('1010.11', 2): " << formatResult(resDouble3, 10.75)
               << " - " << (almostEqual(resDouble3, 10.75) ? "OK" : "FAIL") << "\n";
 
@@ -222,14 +225,96 @@ void testBase() {
 
     if (str1.compare(str2) != 0)
         std::cout << str1 << " is not " << str2 << '\n';
+
+    std::cout << "\n** to_string func **\n";
+    std::cout << "n = -87441:\n";
+    MyString res;
+    int num = -87441;
+    res = to_string_(num);
+    std::cout << res << "\n";
+
+    std::cout << "\n** reverse func **\n";
+    std::cout << "String : pomidori \n";
+    MyString norm("pomidori");
+    norm.reverse();
+    std::cout <<"Result : " << norm;
+
 }
 
 
 
 int main() {
-    testBase();
-    testIterator();
-    testConversions();
-    testFind();
+    // MyString str("12.5.A");
+    // MyString str2("12.5.A");
+    //
+    // MyString str3 = str + str2;
+    // std::cout << str3;
+    // testBase();
+    // testIterator();
+    // testConversions();
+    // testFind();
+    //
+    VectorBananov<int> pomidorik = {1, 3, 23, 3};
+    std::cout << "\nSize : " << pomidorik.size() << " Capacity: " << pomidorik.capacity() << "\n";
+    std::cout << "\n" << pomidorik << "\n";
+
+    pomidorik.push_back(1);
+    std::cout << "\nSize : " << pomidorik.size() << " Capacity: " << pomidorik.capacity() << "\n";
+    std::cout << "\n" << pomidorik << "\n";
+
+    pomidorik.pop_back();
+    std::cout << "\nSize : " << pomidorik.size() << " Capacity: " << pomidorik.capacity() << "\n";
+    std::cout << "\n" << pomidorik << "\n";
+
+    VectorBananov<char> pomidorik2 = {'1', 'f', 'c'};
+    std::cout << "\nSize : " << pomidorik2.size() << " Capacity: " << pomidorik2.capacity() << "\n";
+    std::cout << "\n" << pomidorik2 << "\n";
+
+    pomidorik2.push_back('b');
+    std::cout << "\nSize : " << pomidorik2.size() << " Capacity: " << pomidorik2.capacity() << "\n";
+    std::cout << "\n" << pomidorik2 << "\n";
+
+    pomidorik2.pop_back();
+    std::cout << "\nSize : " << pomidorik2.size() << " Capacity: " << pomidorik2.capacity() << "\n";
+    std::cout << "\n" << pomidorik2 << "\n";
+
+    std::string pormizan = "a vse idet po planu";
+    VectorBananov<char> na_pole_tanki_grohotali(pormizan.data(), pormizan.data() + pormizan.size());
+    std::cout << na_pole_tanki_grohotali;
+
+    VectorBananov<char> pomidor(na_pole_tanki_grohotali.begin(), na_pole_tanki_grohotali.end());
+    std::cout << "\n" << pomidor;
+
+    pomidorik2 = pomidor;
+    std::cout << "\n" << pomidorik2;
+
+    VectorBananov<char> ay_carumba = pomidor;
+    pomidorik2 = std::move(ay_carumba);
+    std::cout << "\n" << pomidorik2;
+
+    pomidorik2.insert(pomidorik2.begin(), 'f');
+    pomidorik2.erase(pomidorik2.begin() + 1);
+
+    std::cout << "\nSize : " << pomidorik2.size() << " Capacity: " << pomidorik2.capacity() << "\n";
+    std::cout << "\n" << pomidorik2 << "\n";
+
+    pomidorik2.clear();
+    std::cout << "\nSize : " << pomidorik2.size() << " Capacity: " << pomidorik2.capacity() << "\n";
+    std::cout << "\n" << pomidorik2 << "\n";
+    pomidorik2.push_back('f');
+    std::cout << "\nSize : " << pomidorik2.size() << " Capacity: " << pomidorik2.capacity() << "\n";
+    std::cout << "\n" << pomidorik2 << "\n";
+
+    pomidorik2.insert(pomidorik2.begin() + 1, na_pole_tanki_grohotali);
+    std::cout << "\nSize : " << pomidorik2.size() << " Capacity: " << pomidorik2.capacity() << "\n";
+    std::cout << "\n" << pomidorik2 << "\n";
+
+    pomidorik2.erase(4, 3);
+    std::cout << "\nSize : " << pomidorik2.size() << " Capacity: " << pomidorik2.capacity() << "\n";
+    std::cout << "\n" << pomidorik2 << "\n";
+
+    pomidorik2.erase(pomidorik2.begin(), pomidorik2.end());
+    std::cout << "\nSize : " << pomidorik2.size() << " Capacity: " << pomidorik2.capacity() << "\n";
+    std::cout << "\n" << pomidorik2 << "\n";
     return 0;
 }

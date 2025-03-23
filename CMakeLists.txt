@@ -14,4 +14,7 @@ add_executable(Term2Classes
         MyString.cpp
         MyStringIterator.cpp
         MyStringIterator.h
+        #VectorBananov.cpp
+        VectorBananov.h
+        VecIterator.h
 )

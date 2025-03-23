@@ -318,8 +318,35 @@ double stod_(const MyString &str, int base = 10) {
     return res;
 }
 
+
 MyString operator+(const MyString &str1, const MyString &str2) {
     MyString res(str1);
     res += str2;
+    return res;
+}
+
+MyString to_string_(int n) {
+    if (n == 0) return MyString("0");
+    MyString res;
+    bool is_neg = n < 0;
+    n = abs(n);
+    while (n > 0) {
+        res.insert(0, (n % 10) + '0');
+        n /= 10;
+    }
+    if (is_neg) res.insert(0, '-');
+    return res;
+}
+
+MyString to_string_(long long n) {
+    if (n == 0) return MyString("0");
+    MyString res;
+    bool is_neg = n < 0;
+    n = abs(n);
+    while (n > 0) {
+        res.insert(0, (n % 10) + '0');
+        n /= 10;
+    }
+    if (is_neg) res.insert(0, '-');
     return res;
 }
